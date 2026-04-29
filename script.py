@@ -98,10 +98,10 @@ def main():
 
     # ❗ НЕТ МОЛНИЙ
     if not events:
-        send_message("⚡ FMI Lightning\n\n❌ Молнии не обнаружены")
+        send_message("⚡ FMI Lightning\n\n❌ Молнии не обнаружены, сообщение из GIT")
         return
 
-    msg = "⚡ FMI Lightning\n\n"
+    msg = "⚡ GIT FMI Lightning\n\n"
 
     nearest = None
     min_d = 999999
