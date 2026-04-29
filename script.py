@@ -123,7 +123,7 @@ def main():
             min_d = d
             nearest = (lat, lon, t, d)
 
-    msg += "\n--- БЛИЖАЙШАЯ ---\n"
+    msg += "\n--- БЛИЖАЙШАЯ (GIT) ---\n"
     msg += f"{nearest[0]:.3f}, {nearest[1]:.3f}\n"
     msg += f"{nearest[2]}\n"
     msg += f"{nearest[3]:.1f} km"
