@@ -2,10 +2,9 @@ import os
 import requests
 import math
 import xml.etree.ElementTree as ET
-from datetime import datetime, timedelta
 
 # ======================
-# TELEGRAM (из Secrets)
+# TELEGRAM
 # ======================
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
@@ -83,6 +82,7 @@ def parse(xml):
             t = time_el.text
 
             events.append((lat, lon, t))
+
         except:
             continue
 
@@ -90,29 +90,43 @@ def parse(xml):
 
 
 # ======================
-# MAIN LOGIC (1 RUN)
+# MAIN
 # ======================
 def main():
     xml = fetch()
     events = parse(xml)
 
-    msg = f"⚡ FMI Lightning check\n\nНайдено: {len(events)}\n\n"
+    # ❗ НЕТ МОЛНИЙ
+    if not events:
+        send_message("⚡ FMI Lightning\n\n❌ Молнии не обнаружены")
+        return
+
+    msg = "⚡ FMI Lightning\n\n"
 
     nearest = None
     min_d = 999999
 
+    count = 0
+    MAX_LINES = 30  # ограничение для Telegram
+
     for lat, lon, t in events:
         d = distance(MY_LAT, MY_LON, lat, lon)
 
-        if d <= RADIUS_KM:
-            msg += f"⚡ {lat:.3f}, {lon:.3f} | {t} | {d:.1f} km\n"
+        line = f"⚡ {lat:.3f}, {lon:.3f} | {t} | {d:.1f} km\n"
+
+        # добавляем только часть, чтобы не превысить лимит
+        if count < MAX_LINES:
+            msg += line
+            count += 1
 
         if d < min_d:
             min_d = d
             nearest = (lat, lon, t, d)
 
-    if nearest:
-        msg += f"\n--- БЛИЖАЙШАЯ ---\n{nearest[0]:.3f}, {nearest[1]:.3f}\n{nearest[2]}\n{nearest[3]:.1f} km"
+    msg += "\n--- БЛИЖАЙШАЯ ---\n"
+    msg += f"{nearest[0]:.3f}, {nearest[1]:.3f}\n"
+    msg += f"{nearest[2]}\n"
+    msg += f"{nearest[3]:.1f} km"
 
     send_message(msg)
 
